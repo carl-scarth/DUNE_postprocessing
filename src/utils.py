@@ -1,9 +1,9 @@
 import pandas as pd
 import numpy as np
+from matplotlib.pyplot import rcParams
 
 def load_curves(src):
     # Load in Jean's curves data
-    print(src)
     # In some of the curves files the last 4 columns headers are missing, namely:
     # DIC displacement in three components plus Euclidean norm
     # To get around this I read in the header separately and append the extra values if necessary
@@ -21,3 +21,39 @@ def load_curves(src):
     curves_data.sort_index(inplace=True)
 
     return(curves_data)
+
+def extract_failure_load(curves_data, failure_cols, load_col = "applied_load"):
+    # Default names of columns containing failure indices
+    
+    failure_load = []
+    # Loop over each failure mode
+    for col in failure_cols:
+        # Determine if failure occurs in this mode
+        failure_init = curves_data[col]>=1.0
+        if failure_init.any():
+            # If failure occurs - find iteration at which failure occurs
+            # Linearly interpolate failure load from previous iteration
+            failure_ind = curves_data[failure_init].iloc[0].name
+            postfailure_load = curves_data.iloc[failure_ind][load_col]
+            prefailure_load = curves_data.iloc[failure_ind-1][load_col]
+            postfailure_fi = curves_data.iloc[failure_ind][col]
+            prefailure_fi = curves_data.iloc[failure_ind-1][col]
+            # Linear interpolate assuming failure happens at failure index of 1
+            alpha = (1 - prefailure_fi)/(postfailure_fi - prefailure_fi)
+            failure_load.append(prefailure_load + alpha*(postfailure_load - prefailure_load))
+        else:
+            # Otherwise return a nan
+            failure_load.append(np.nan)
+            
+    return(failure_load)
+
+def set_plot_params():
+    # Set commonly used plot parameters to desired values
+    # Plotting parameters
+    rcParams.update({'figure.figsize' : (8,6),
+                    'font.size': 16,
+                    'figure.titlesize' : 18,
+                    'axes.labelsize': 18,
+                    'xtick.labelsize': 15,
+                    'ytick.labelsize': 15,
+                    'legend.fontsize': 12})    
