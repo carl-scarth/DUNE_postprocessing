@@ -23,8 +23,7 @@ def load_curves(src):
     return(curves_data)
 
 def extract_failure_load(curves_data, failure_cols, load_col = "applied_load"):
-    # Default names of columns containing failure indices
-    
+    # Extract failure load in each mode using linear interpolation   
     failure_load = []
     # Loop over each failure mode
     for col in failure_cols:
@@ -56,4 +55,4 @@ def set_plot_params():
                     'axes.labelsize': 18,
                     'xtick.labelsize': 15,
                     'ytick.labelsize': 15,
-                    'legend.fontsize': 12})    
+                    'legend.fontsize': 12}) 
