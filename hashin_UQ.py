@@ -10,8 +10,8 @@ from utils import load_curves, uniform_LHS
 
 if __name__ == "__main__":
     # Define folder where vtks and (if used) curves files are stored
-    vtk_folder = "C:/Users/cs2361/Documents/Jean_Benezech/DUNE-TEMP/CS04D_41-80/"
-    curves_folder = "C:/Users/cs2361/Documents/Jean_Benezech/DUNE_curves/CS04D_41-80/"
+    vtk_folder = "inputs/VTKs/"
+    curves_folder = "inputs/curves/"
     append_curves = True # Append force and displacement data from curves files?
 
     # Load in curves data if needed
@@ -75,7 +75,7 @@ if __name__ == "__main__":
             out_frame_i["Sample"] = sample[0]
             out_frame_i["init_sam"] = int(x_i["init_sam"])
             # Write individual sample to .csv
-            out_frame_i.to_csv("_".join(("outputs/hashin_UQ_out",subfolder,str(i))) + ".csv", index=False)
+            out_frame_i.to_csv("_".join(("outputs/hashin_UQ_out",subfolder,str(sample[0]))) + ".csv", index=False)
             # Append to overall dataframe
             if out_frame is None:
                 out_frame = out_frame_i
