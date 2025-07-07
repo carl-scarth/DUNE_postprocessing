@@ -108,4 +108,5 @@ if __name__ == "__main__":
 
     # Print summary of results
     print(failure_load)
+    failure_load.to_csv("outputs/curves_outputs.csv")
     plt.show()
