@@ -44,7 +44,6 @@ if __name__ == "__main__":
     failure_load = []
     i = 0
     for i, file in enumerate(os.listdir(in_folder)):
-        # if file.split(".")[-1] == "txt":
         curves_data = load_curves(os.path.join(in_folder,file))
         curves_data = curves_data[cols_qoi]
         curves_data["Increment"] = curves_data.index
