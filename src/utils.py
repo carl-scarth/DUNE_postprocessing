@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from matplotlib.pyplot import rcParams
+from scipy.stats.qmc import LatinHypercube
 
 def load_curves(src):
     # Load in Jean's curves data
@@ -45,6 +46,23 @@ def extract_failure_load(curves_data, failure_cols, load_col = "applied_load"):
             failure_load.append(np.nan)
             
     return(failure_load)
+
+def uniform_LHS(input_df, N):
+    # Takes an LHS of set of a set of inputs and transforms to lie between
+    # The specified lower and upper bounds given in input_dict
+    
+    d = input_df.shape[1] # Number of inputs
+    # Generate a set of N samples using the required Latin Hypercube sampler
+    sampler = LatinHypercube(d=d, optimization = "random-cd")
+    FLHS = sampler.random(N)
+    # Get lower and upper bounds
+    lb = input_df.iloc[0].values
+    ub = input_df.iloc[1].values
+    # Transform onto the required range
+    xLHS = FLHS*(ub-lb) + lb
+    xLHS = pd.DataFrame(xLHS, columns = input_df.columns)
+    
+    return(xLHS)
 
 def set_plot_params():
     # Set commonly used plot parameters to desired values
