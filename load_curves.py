@@ -72,6 +72,11 @@ if __name__ == "__main__":
     force_disp_DIC = [CurvesPlot() for col in cols_disp]
     failure_plot = [CurvesPlot() for col in cols_failure]
     
+    # EXTRA PLOT WITH EVERYTHING - bodge
+    all_FI = CurvesPlot()
+    crit_FI = ["Max_F_FT", "Max_F_FC", "Max_F_MC", "max_predamage_cohesive"]
+    failure_colour = ["r","g","b","m"]
+
     # Populate plots from each sample curves file
     for i, sample_df in curves_frame.groupby(level=0):
         # Plot Applied Load VS Applied Displacement
@@ -83,6 +88,8 @@ if __name__ == "__main__":
         failure_load_i[failure_load_i.index != crit_load.iloc[i].failure_mode] = np.nan
         # Plot Applied Load VS Failure Index
         [fmode_plot.plot_failure_ind(sample_df, col_load, column, failure_load = failure_load_i, markersize = 12, color = color_cycle[i]) for column, fmode_plot in zip(cols_failure, failure_plot)]
+        for mode in crit_FI:
+            [all_FI.plot_failure_ind(sample_df, col_load, column, failure_load = failure_load_i, markersize = 12, color = colour) for column, colour in zip(crit_FI,failure_colour)]
     
     # Sets plot limits, add labels etc
     max_disp = [curves_frame[col].max() for col in cols_disp]
@@ -93,13 +100,28 @@ if __name__ == "__main__":
     force_disp.set_title("Force VS Crosshead Displacement")
     [plot.set_xlim([0, disp_lim]) for plot, disp_lim in zip(force_disp_DIC, max_disp)]
     [plot.set_ylim([0, max_force]) for plot in force_disp_DIC]
-    [plot.set_title(title) for plot, title in zip(force_disp_DIC, cols_disp)]
+    # [plot.set_title(title) for plot, title in zip(force_disp_DIC, cols_disp)]
+    [plot.set_title(title) for plot, title in zip(force_disp_DIC, ["Longitudinal displacement end of web\n(Displacement_DIC[2])","Out-of-plane displacement web centre\n(D_xmax[0])"])]
+    [plot.ax.grid(visible=True,ls="--",color="0.8", alpha=1.0, linewidth=0.75) for plot in force_disp_DIC]
     for plot, title in zip(failure_plot, cols_failure):
         plot.set_xlim([0, max_force])
         plot.set_xlabel("Force (kN)")
         plot.plot_limit_state()
+        #plot.set_title(title)
+    all_FI.set_xlim([0, max_force])
+    all_FI.set_xlabel("Force (kN)")
+    all_FI.plot_limit_state()
+    all_FI.plot_legend()
+    all_FI.set_title("Failure Index for all critical modes across the dataset")
+
+    failure_labels = ["Fibre tension (Max_F_FT)", "Fibre compression (Max_F_FC)", 
+                      "Matrix tension (Max_F_MT)", "Matrix compression (Max_F_MC)",
+                      "Through-thickness (Max_F_33)", "Non-delam Cohesive (max_damage_cohesive)" , "Delam (max_predamage_cohesive)"]
+    for plot, title in zip(failure_plot,failure_labels):
         plot.set_title(title)
+    [plot.ax.grid(visible=True,ls="--",color="0.8", alpha=1.0, linewidth=0.75) for plot in failure_plot]
     
+
     # Used to identify different samples vvv - not recommended for more than 10 samples
     #force_disp.plot_legend(simplify_labels=False)
     #[plot.plot_legend(simplify_labels=False) for plot in force_disp_DIC]
@@ -107,5 +129,9 @@ if __name__ == "__main__":
 
     # Print summary of results
     print(failure_load)
+    print("")
+    print(failure_load.count())
+    print("")
+    print(failure_load["failure_mode"].dropna())
     failure_load.to_csv("outputs/curves_outputs.csv")
     plt.show()

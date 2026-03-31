@@ -68,9 +68,9 @@ def set_plot_params():
     # Set commonly used plot parameters to desired values
     # Plotting parameters
     rcParams.update({'figure.figsize' : (8,6),
-                    'font.size': 16,
-                    'figure.titlesize' : 18,
-                    'axes.labelsize': 18,
+                    'font.size': 14,
+                    'figure.titlesize' : 16,
+                    'axes.labelsize': 16,
                     'xtick.labelsize': 15,
                     'ytick.labelsize': 15,
                     'legend.fontsize': 12}) 
